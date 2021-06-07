@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface ClientRepository extends CrudRepository<ClientEntity, Long> {
     @Query("SELECT c FROM clients c WHERE c.client_id = ?1")
-    ClientEntity findClientById (Long clientId);
+    ClientEntity findClientByClientId (Long clientId);
 }

@@ -1,7 +1,10 @@
 package com.example.vitaliibazylo.service;
 
 import com.example.vitaliibazylo.api.requests.CreatePaymentRequest;
+import com.example.vitaliibazylo.api.requests.PaymentLogRequest;
+import com.example.vitaliibazylo.api.responce.PaymentLogResponse;
 import com.example.vitaliibazylo.api.responce.PaymentResponse;
+import com.example.vitaliibazylo.models.ClientEntity;
 import com.example.vitaliibazylo.models.PaymentEntity;
 import com.example.vitaliibazylo.repository.AccountRepository;
 import com.example.vitaliibazylo.repository.ClientRepository;
@@ -37,7 +40,7 @@ public class PaymentService {
             var destBalance = destinationAcc.getBalance();
             var paymentStatus = "";
 
-            if(sourceBalance > request.getAmount()) {
+            if(sourceBalance >= request.getAmount()) {
                 sourceAcc.setBalance(sourceBalance - paymentsRequest.get(i).getAmount());
                 destinationAcc.setBalance(destBalance + request.getAmount());
                 paymentStatus = "ok";
@@ -51,6 +54,8 @@ public class PaymentService {
                             null,
                             paymentId,
                             new Date(),
+                            sourceAcc.getAccountId(),
+                            destinationAcc.getAccountId(),
                             sourceAcc.getAccountNum(),
                             destinationAcc.getAccountNum(),
                             request.getAmount(),
@@ -65,5 +70,41 @@ public class PaymentService {
             paymentResponses.add(paymentResponse);
         }
         return paymentResponses;
+    }
+
+    public List<PaymentLogResponse> createPaymentLog (PaymentLogRequest request){
+
+        PaymentLogResponse paymentLog = new PaymentLogResponse();
+        List<PaymentLogResponse> paymentLogResponses = new ArrayList<>();
+        PaymentLogResponse.Payer payer = new PaymentLogResponse.Payer();
+        PaymentLogResponse.Recipient recipient = new PaymentLogResponse.Recipient();
+        List<PaymentEntity> paymentEntities = paymentRepository.findPaymentEntityByPayerIdAndRecipientIdAndSrcAccIdAndDestAccId(
+                request.getPayerId(),
+                request.getRecipientId(),
+                request.getSourceAccId(),
+                request.getDestAccId()
+        );
+        for (PaymentEntity paymentEntity : paymentEntities) {
+            ClientEntity payerEntity = clientRepository.findClientByClientId(paymentEntity.getPayerId());
+            ClientEntity recipientEntity = clientRepository.findClientByClientId(paymentEntity.getRecipientId());
+
+            payer.setFirstName(payerEntity.getFirstName());
+            payer.setLastName(payerEntity.getLastName());
+
+            recipient.setFirstName(recipientEntity.getFirstName());
+            recipient.setLastName(recipientEntity.getLastName());
+
+            paymentLog.setPaymentId(paymentEntity.getPaymentId());
+            paymentLog.setTimestamp(paymentEntity.getDate());
+            paymentLog.setSrcAccNum(paymentEntity.getSrcAccNum());
+            paymentLog.setDestAccNum(paymentEntity.getDestAccNum());
+            paymentLog.setAmount(paymentEntity.getAmount());
+            paymentLog.setPayer(payer);
+            paymentLog.setRecipient(recipient);
+            paymentLog.setStatus(paymentEntity.getStatus());
+
+            paymentLogResponses.add(paymentLog);
+        }
+        return paymentLogResponses;
     }
 }

@@ -7,11 +7,12 @@ import com.example.vitaliibazylo.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
-public class InitService {
+public class ClientService {
 
     @Autowired
     ClientRepository clientRepository;
@@ -45,5 +46,24 @@ public class InitService {
                         )
                 )
         );
+    }
+
+    public List<Account> getUserAccounts(Long clientId) {
+        List<Account> accounts = new ArrayList<>();
+
+        List<AccountEntity> accountEntities = accountRepository.findAccountEntitiesByClientId(clientId);
+
+        for (AccountEntity entity : accountEntities) {
+            Account account = new Account();
+            AccountEntity accountEntity;
+            accountEntity = entity;
+            account.setAccountId(accountEntity.getAccountId());
+            account.setAccountNum(accountEntity.getAccountNum());
+            account.setAccountType(accountEntity.getAccountType());
+            account.setBalance(accountEntity.getBalance());
+
+            accounts.add(account);
+        }
+        return accounts;
     }
 };

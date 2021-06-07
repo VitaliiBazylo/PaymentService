@@ -1,12 +1,12 @@
 package com.example.vitaliibazylo.api.controllers;
 
 import com.example.vitaliibazylo.api.requests.CreatePaymentRequest;
+import com.example.vitaliibazylo.api.requests.PaymentLogRequest;
+import com.example.vitaliibazylo.api.responce.PaymentLogResponse;
 import com.example.vitaliibazylo.api.responce.PaymentResponse;
 import com.example.vitaliibazylo.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,6 +20,11 @@ class PaymentController {
     List<PaymentResponse> createPayment(@RequestBody List<CreatePaymentRequest> request) {
         List<PaymentResponse> paymentResponse = paymentService.createPayment(request);
         return paymentResponse;
+    };
+
+    @GetMapping("/payment")
+    List<PaymentLogResponse> getPaymentLog (@RequestBody PaymentLogRequest request) {
+        return paymentService.createPaymentLog(request);
     };
 
 };

@@ -17,6 +17,8 @@ public class PaymentEntity {
     private Long    id;
     private Long    paymentId;
     private Date    date;
+    private Long    srcAccId;
+    private Long    destAccId;
     private Long    srcAccNum;
     private Long    destAccNum;
     private Integer amount;
